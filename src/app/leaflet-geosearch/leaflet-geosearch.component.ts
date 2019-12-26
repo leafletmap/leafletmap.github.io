@@ -3,6 +3,10 @@ import { Component, OnInit } from '@angular/core';
 // Leaflet
 import * as L from 'leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import {
+  HttpClient
+} from '@angular/common/http';
+
 
 @Component({
   selector: 'app-leaflet-geosearch',
@@ -16,7 +20,7 @@ export class LeafletGeosearchComponent implements OnInit {
     label: '15 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội'
   };
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.initMap();
@@ -79,6 +83,24 @@ export class LeafletGeosearchComponent implements OnInit {
         .addTo(map)
         .bindPopup(this.location.label)
         .openPopup();
+    });
+
+    map.on('click', (e) => {
+      this.http.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`).subscribe((res: any) => {
+        if (res) {
+          if (marker) { // check
+            map.removeLayer(marker); // remove
+          }
+          this.location = {
+            x: e.latlng.lng,
+            y: e.latlng.lat,
+            label: res.display_name,
+          };
+          marker = new L.Marker([this.location.y, this.location.x]).addTo(map)
+            .bindPopup(this.location.label)
+            .openPopup();
+        }
+      });
     });
   }
 
