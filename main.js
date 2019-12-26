@@ -110,10 +110,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm5/platform-browser.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _app_routing_module__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app-routing.module */ "./src/app/app-routing.module.ts");
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
-/* harmony import */ var _google_maps_google_maps_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./google-maps/google-maps.component */ "./src/app/google-maps/google-maps.component.ts");
-/* harmony import */ var _leaflet_geosearch_leaflet_geosearch_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./leaflet-geosearch/leaflet-geosearch.component */ "./src/app/leaflet-geosearch/leaflet-geosearch.component.ts");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _app_routing_module__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./app-routing.module */ "./src/app/app-routing.module.ts");
+/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
+/* harmony import */ var _google_maps_google_maps_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./google-maps/google-maps.component */ "./src/app/google-maps/google-maps.component.ts");
+/* harmony import */ var _leaflet_geosearch_leaflet_geosearch_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./leaflet-geosearch/leaflet-geosearch.component */ "./src/app/leaflet-geosearch/leaflet-geosearch.component.ts");
+
 
 
 
@@ -127,16 +129,17 @@ var AppModule = /** @class */ (function () {
     AppModule = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["NgModule"])({
             declarations: [
-                _app_component__WEBPACK_IMPORTED_MODULE_4__["AppComponent"],
-                _google_maps_google_maps_component__WEBPACK_IMPORTED_MODULE_5__["GoogleMapsComponent"],
-                _leaflet_geosearch_leaflet_geosearch_component__WEBPACK_IMPORTED_MODULE_6__["LeafletGeosearchComponent"]
+                _app_component__WEBPACK_IMPORTED_MODULE_5__["AppComponent"],
+                _google_maps_google_maps_component__WEBPACK_IMPORTED_MODULE_6__["GoogleMapsComponent"],
+                _leaflet_geosearch_leaflet_geosearch_component__WEBPACK_IMPORTED_MODULE_7__["LeafletGeosearchComponent"]
             ],
             imports: [
                 _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["BrowserModule"],
-                _app_routing_module__WEBPACK_IMPORTED_MODULE_3__["AppRoutingModule"]
+                _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpClientModule"],
+                _app_routing_module__WEBPACK_IMPORTED_MODULE_4__["AppRoutingModule"]
             ],
             providers: [],
-            bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_4__["AppComponent"]]
+            bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_5__["AppComponent"]]
         })
     ], AppModule);
     return AppModule;
@@ -241,76 +244,137 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! leaflet-geosearch */ "./node_modules/leaflet-geosearch/lib/index.js");
 /* harmony import */ var leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
 
 // Angular
 
 // Leaflet
 
 
+
 var LeafletGeosearchComponent = /** @class */ (function () {
-    function LeafletGeosearchComponent() {
+    function LeafletGeosearchComponent(http) {
+        this.http = http;
         this.location = {
             x: 105.780128,
             y: 21.029356,
-            label: '15 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội'
+            label: ''
         };
     }
     LeafletGeosearchComponent.prototype.ngOnInit = function () {
         this.initMap();
     };
     LeafletGeosearchComponent.prototype.initMap = function () {
+        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+            var map, provider, searchControl, marker;
+            var _this = this;
+            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getCurrentLocationXY()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.getCurrentLocationLabel()];
+                    case 2:
+                        _a.sent();
+                        // refresh map id
+                        document.getElementById("contain-map").innerHTML = "<div id='map' style='width: 100%; height: 100%;'></div>";
+                        map = leaflet__WEBPACK_IMPORTED_MODULE_2__["map"]("map", {
+                            // Set latitude and longitude of the map center (required)
+                            center: [this.location.y, this.location.x],
+                            // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
+                            zoom: 16
+                        });
+                        // add icon
+                        leaflet__WEBPACK_IMPORTED_MODULE_2__["icon"]({
+                            iconUrl: "assets/images/marker-icon.png",
+                            // shadowUrl: 'assets/images/icons/Blank.png',
+                            iconSize: [25, 41],
+                            // shadowSize:   [50, 64], // size of the shadow
+                            iconAnchor: [9, 40],
+                            // shadowAnchor: [4, 62],  // the same for the shadow
+                            popupAnchor: [0, -40] // point from which the popup should open relative to the iconAnchor
+                        });
+                        leaflet__WEBPACK_IMPORTED_MODULE_2__["control"].scale().addTo(map);
+                        // Create a Tile Layer and add it to the map
+                        leaflet__WEBPACK_IMPORTED_MODULE_2__["tileLayer"]("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                            attribution: '&copy; <a href="http://osm.org/copyright"></a> contributors'
+                        }).addTo(map);
+                        provider = new leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__["OpenStreetMapProvider"]();
+                        searchControl = new leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__["GeoSearchControl"]({
+                            provider: provider,
+                            autoClose: true
+                        });
+                        map.addControl(searchControl);
+                        marker = leaflet__WEBPACK_IMPORTED_MODULE_2__["marker"]([this.location.y, this.location.x])
+                            .addTo(map)
+                            .bindPopup(this.location.label)
+                            .openPopup();
+                        // handler event search
+                        map.on("geosearch/showlocation", function (e) {
+                            if (marker) {
+                                // check
+                                map.removeLayer(marker); // remove
+                            }
+                            _this.location = {
+                                x: e.location.x,
+                                y: e.location.y,
+                                label: e.location.label
+                            };
+                            marker = new leaflet__WEBPACK_IMPORTED_MODULE_2__["Marker"]([_this.location.y, _this.location.x])
+                                .addTo(map)
+                                .bindPopup(_this.location.label)
+                                .openPopup();
+                        });
+                        map.on('click', function (e) {
+                            _this.http.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng).subscribe(function (res) {
+                                if (res) {
+                                    if (marker) { // check
+                                        map.removeLayer(marker); // remove
+                                    }
+                                    _this.location = {
+                                        x: e.latlng.lng,
+                                        y: e.latlng.lat,
+                                        label: res.display_name,
+                                    };
+                                    marker = new leaflet__WEBPACK_IMPORTED_MODULE_2__["Marker"]([_this.location.y, _this.location.x]).addTo(map)
+                                        .bindPopup(_this.location.label)
+                                        .openPopup();
+                                }
+                            });
+                        });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
+     * GET
+     * latitude
+     * longitude
+     */
+    LeafletGeosearchComponent.prototype.getCurrentLocationXY = function () {
         var _this = this;
-        // refresh map id
-        document.getElementById("contain-map").innerHTML = "<div id='map' style='width: 100%; height: 100%;'></div>";
-        // init map
-        var map = leaflet__WEBPACK_IMPORTED_MODULE_2__["map"]("map", {
-            // Set latitude and longitude of the map center (required)
-            center: [this.location.y, this.location.x],
-            // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
-            zoom: 16
+        return new Promise(function (resolve, reject) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                _this.location.y = position.coords.latitude;
+                _this.location.x = position.coords.longitude;
+                resolve();
+            }, function (err) { return reject(err); });
         });
-        // add icon
-        leaflet__WEBPACK_IMPORTED_MODULE_2__["icon"]({
-            iconUrl: "assets/images/marker-icon.png",
-            // shadowUrl: 'assets/images/icons/Blank.png',
-            iconSize: [25, 41],
-            // shadowSize:   [50, 64], // size of the shadow
-            iconAnchor: [9, 40],
-            // shadowAnchor: [4, 62],  // the same for the shadow
-            popupAnchor: [0, -40] // point from which the popup should open relative to the iconAnchor
-        });
-        leaflet__WEBPACK_IMPORTED_MODULE_2__["control"].scale().addTo(map);
-        // Create a Tile Layer and add it to the map
-        leaflet__WEBPACK_IMPORTED_MODULE_2__["tileLayer"]("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; <a href="http://osm.org/copyright"></a> contributors'
-        }).addTo(map);
-        // add search control https://github.com/smeijer/leaflet-geosearch
-        var provider = new leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__["OpenStreetMapProvider"]();
-        var searchControl = new leaflet_geosearch__WEBPACK_IMPORTED_MODULE_3__["GeoSearchControl"]({
-            provider: provider,
-            autoClose: true
-        });
-        map.addControl(searchControl);
-        // popover marker
-        var marker = leaflet__WEBPACK_IMPORTED_MODULE_2__["marker"]([this.location.y, this.location.x])
-            .addTo(map)
-            .bindPopup(this.location.label)
-            .openPopup();
-        // handler event search
-        map.on("geosearch/showlocation", function (e) {
-            if (marker) {
-                // check
-                map.removeLayer(marker); // remove
-            }
-            _this.location = {
-                x: e.location.x,
-                y: e.location.y,
-                label: e.location.label
-            };
-            marker = new leaflet__WEBPACK_IMPORTED_MODULE_2__["Marker"]([_this.location.y, _this.location.x])
-                .addTo(map)
-                .bindPopup(_this.location.label)
-                .openPopup();
+    };
+    /**
+     * GET
+     * Location name by latitude && longitude
+     */
+    LeafletGeosearchComponent.prototype.getCurrentLocationLabel = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.http.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + _this.location.y + "&lon=" + _this.location.x).subscribe(function (res) {
+                if (res) {
+                    _this.location.label = res.display_name;
+                    resolve(res);
+                }
+            }, function (err) { return reject(err); });
         });
     };
     LeafletGeosearchComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
@@ -319,7 +383,7 @@ var LeafletGeosearchComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./leaflet-geosearch.component.html */ "./src/app/leaflet-geosearch/leaflet-geosearch.component.html"),
             styles: [__webpack_require__(/*! ./leaflet-geosearch.component.css */ "./src/app/leaflet-geosearch/leaflet-geosearch.component.css")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_4__["HttpClient"]])
     ], LeafletGeosearchComponent);
     return LeafletGeosearchComponent;
 }());
