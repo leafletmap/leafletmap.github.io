@@ -17,7 +17,7 @@ export class LeafletGeosearchComponent implements OnInit {
   public location: any = {
     x: 105.780128,
     y: 21.029356,
-    label: '15 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội'
+    label: ''
   };
 
   constructor(private http: HttpClient) { }
@@ -26,7 +26,9 @@ export class LeafletGeosearchComponent implements OnInit {
     this.initMap();
   }
 
-  public initMap(): void {
+  public async initMap(): Promise<void> {
+    await this.getCurrentLocationXY();
+    await this.getCurrentLocationLabel();
     // refresh map id
     document.getElementById(
       "contain-map"
@@ -101,6 +103,36 @@ export class LeafletGeosearchComponent implements OnInit {
             .openPopup();
         }
       });
+    });
+  }
+
+  /**
+   * GET
+   * latitude
+   * longitude
+   */
+  private getCurrentLocationXY(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(position => {
+        this.location.y = position.coords.latitude;
+        this.location.x = position.coords.longitude;
+        resolve();
+      }, err => reject(err));
+    });
+  }
+
+  /**
+   * GET
+   * Location name by latitude && longitude
+   */
+  private getCurrentLocationLabel(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.location.y}&lon=${this.location.x}`).subscribe((res: any) => {
+        if (res) {
+          this.location.label = res.display_name;
+          resolve(res);
+        }
+      }, err => reject(err));
     });
   }
 
